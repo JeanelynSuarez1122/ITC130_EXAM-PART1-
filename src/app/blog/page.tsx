@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { BlogPost } from "../types/blog";
 import { User } from "../types/user";
 import Link from "next/link";
+import { Category } from "@/app/types/category";
 
 export default function BlogList() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     fetch("/api/blog")
@@ -16,10 +18,16 @@ export default function BlogList() {
     fetch("/api/users")
       .then((res) => res.json())
       .then(setUsers);
+    fetch("/api/category")
+      .then((res) => res.json())
+      .then(setCategories);
   }, []);
 
   const getAuthorName = (id: string) =>
     users.find((u) => u.id === id)?.name || "Unknown";
+
+  const getCategoryName = (id: string) =>
+    categories.find((c) => c.id === id)?.name || "Unknown";
 
   return (
     <div className="p-6">
@@ -36,9 +44,11 @@ export default function BlogList() {
           >
             <h2 className="text-xl font-semibold">{post.title}</h2>
             <p className="text-sm text-gray-600">
-              By {getAuthorName(post.authorId)} on{" "}
+              By {getAuthorName(post.authorId)} in{" "}
+              {getCategoryName(post.categoryId)} on{" "}
               {new Date(post.date).toLocaleDateString()}
             </p>
+
             <p className="mt-2 text-gray-800 line-clamp-3">{post.content}</p>
           </Link>
         ))}

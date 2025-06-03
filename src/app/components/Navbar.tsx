@@ -24,6 +24,7 @@ const Navbar = () => {
         {navLink("/", "Home")}
         {navLink("/users", "Users")}
         {navLink("/blog", "Blog")}
+        {navLink('/categories', 'Categories')}
       </div>
     </nav>
   );

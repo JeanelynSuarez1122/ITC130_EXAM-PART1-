@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { User } from "../../types/user";
 import { useRouter } from "next/navigation";
+import { Category } from "@/app/types/category";
 
 export default function AddBlogPage() {
   const [title, setTitle] = useState<string>("");
@@ -10,27 +11,32 @@ export default function AddBlogPage() {
   const [authorId, setAuthorId] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string>("");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryId, setCategoryId] = useState("");
   const router = useRouter();
 
   useEffect(() => {
     fetch("/api/users")
       .then((res) => res.json())
       .then(setUsers);
+    fetch("/api/category")
+      .then((res) => res.json())
+      .then(setCategories);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || content.length < 50 || !authorId) {
+    if (!title || content.length < 50 || !authorId || !categoryId) {
       setError(
-        "Title is required. Content must be at least 50 characters. Select an author."
+        "Please fill in all fields. Content must be at least 50 characters."
       );
       return;
     }
 
     const res = await fetch("/api/blog", {
       method: "POST",
-      body: JSON.stringify({ title, content, authorId }),
+      body: JSON.stringify({ title, content, authorId, categoryId }),
       headers: { "Content-Type": "application/json" },
     });
 
@@ -68,6 +74,19 @@ export default function AddBlogPage() {
           {users.map((user) => (
             <option key={user.id} value={user.id}>
               {user.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="w-full border px-3 py-2 rounded"
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+        >
+          <option value="">Select Category</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
             </option>
           ))}
         </select>
